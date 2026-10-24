@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /includes/
+Disallow: /uploads/
+Allow: /
+# Set your complete sitemap URL in this file after deployment, e.g. https://yourdomain.example/sitemap.xml

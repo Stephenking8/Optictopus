@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 350" class="octo-figure" role="img" aria-label="Happy lavender baby octopus" focusable="false">
+<style>.octo-eye-closed,.octo-brow,.octo-confused-mark,.octo-mouth{display:none}</style>
+<defs>
+ <linearGradient id="octo-skin" x1=".16" y1="0" x2=".89" y2="1"><stop stop-color="#DDBFFF"/><stop offset=".49" stop-color="#BD91F5"/><stop offset="1" stop-color="#A87BEE"/></linearGradient>
+ <linearGradient id="octo-arm-shade" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#CDA6FC"/><stop offset="1" stop-color="#A87AEF"/></linearGradient>
+ <linearGradient id="octo-face" x1=".15" y1="0" x2=".8" y2="1"><stop stop-color="#D9B9FF"/><stop offset="1" stop-color="#AB7BEF"/></linearGradient>
+</defs>
+<!-- Separate tentacles are deliberately shaped as editable SVG groups for real animation. -->
+<g class="octo-back-arms" stroke="#2C194B" stroke-width="6.2" stroke-linejoin="round" stroke-linecap="round">
+ <g class="octo-arm octo-arm-1" style="--angle:-1;--phase:-1.7s"><path d="M119 219 C91 218 74 230 54 243 C37 253 28 239 24 228 C20 217 6 223 7 239 C8 271 32 284 55 274 C84 263 106 254 134 239 Z" fill="url(#octo-arm-shade)"/></g>
+ <g class="octo-arm octo-arm-2" style="--angle:-1;--phase:-2.5s"><path d="M136 235 C107 246 96 266 79 289 C68 301 56 300 49 291 C40 281 28 295 35 311 C45 334 70 337 87 320 C108 300 134 273 150 246 Z" fill="url(#octo-arm-shade)"/></g>
+ <g class="octo-arm octo-arm-7" style="--angle:1;--phase:-.9s"><path d="M224 235 C253 246 264 266 281 289 C292 301 304 300 311 291 C320 281 332 295 325 311 C315 334 290 337 273 320 C252 300 226 273 210 246 Z" fill="url(#octo-arm-shade)"/></g>
+ <g class="octo-arm octo-arm-8" style="--angle:1;--phase:-2.1s"><path d="M241 219 C269 218 286 230 306 243 C323 253 332 239 336 228 C340 217 354 223 353 239 C352 271 328 284 305 274 C276 263 254 254 226 239 Z" fill="url(#octo-arm-shade)"/></g>
+</g>
+<!-- Rounded head / mantle, blush and luminous soft highlight. -->
+<g class="octo-mantle">
+ <path d="M180 30 C117 30 84 66 77 115 C71 151 83 194 105 222 C120 243 144 254 180 254 C216 254 240 243 255 222 C277 194 289 151 283 115 C276 66 243 30 180 30 Z" fill="url(#octo-face)" stroke="#2C194B" stroke-width="6.4" stroke-linejoin="round"/>
+ <path d="M108 104 C114 70 137 50 161 46 C144 44 105 62 99 97 C96 109 104 119 108 104 Z" fill="#FFF8FF" opacity=".46"/>
+ <ellipse cx="117" cy="207" rx="15" ry="7" fill="#F5A3D7" opacity=".45" />
+ <ellipse cx="243" cy="207" rx="15" ry="7" fill="#F5A3D7" opacity=".45" />
+</g>
+<!-- Faces: eyes always visible, mouth only for selected style. -->
+<g class="octo-face-group">
+ <g class="octo-open-eyes">
+   <g class="octo-eye-left" data-eye="left"><ellipse cx="149" cy="174" rx="12" ry="14" fill="#25143C"/><circle cx="145.5" cy="169" r="4" fill="white"/><circle cx="153" cy="178" r="2.1" fill="#DFC6FF"/></g>
+   <g class="octo-eye-right" data-eye="right"><ellipse cx="211" cy="174" rx="12" ry="14" fill="#25143C"/><circle cx="207.5" cy="169" r="4" fill="white"/><circle cx="215" cy="178" r="2.1" fill="#DFC6FF"/></g>
+ </g>
+ <path class="octo-eye-closed octo-eye-closed-left" d="M137 176 Q149 164 161 176" fill="none" stroke="#25143C" stroke-width="6.5" stroke-linecap="round"/>
+ <path class="octo-eye-closed octo-eye-closed-right" d="M199 176 Q211 164 223 176" fill="none" stroke="#25143C" stroke-width="6.5" stroke-linecap="round"/>
+ <path class="octo-brow octo-brow-left" d="M137 150 L161 156" fill="none" stroke="#25143C" stroke-width="5.2" stroke-linecap="round"/>
+ <path class="octo-brow octo-brow-right" d="M199 156 L223 150" fill="none" stroke="#25143C" stroke-width="5.2" stroke-linecap="round"/>
+ <g class="octo-confused-mark" fill="none" stroke="#9168D3" stroke-width="5" stroke-linecap="round"><path d="M252 135 C254 120 276 121 271 134 Q268 141 264 143"/><circle cx="264" cy="153" r="2.4" fill="#9168D3" stroke="none"/></g>
+ <g class="octo-mouth octo-mouth-happy"><path d="M168 197 Q180 208 192 197 Q190 216 180 216 Q169 216 168 197Z" fill="#2C194B"/><path d="M174 210 Q180 206 186 210" fill="none" stroke="#EE9EC6" stroke-width="5" stroke-linecap="round"/></g>
+ <path class="octo-mouth octo-mouth-smile" d="M169 197 Q180 210 191 197" fill="none" stroke="#2C194B" stroke-width="5.8" stroke-linecap="round"/>
+ <circle class="octo-mouth octo-mouth-confused" cx="180" cy="201" r="5.2" fill="#2C194B"/>
+ <path class="octo-mouth octo-mouth-mad" d="M170 207 Q180 195 190 207" fill="none" stroke="#2C194B" stroke-width="5.7" stroke-linecap="round"/>
+ </g>
+<!-- Four foreground arms, all pointing down in their rest pose. -->
+<g class="octo-front-arms" stroke="#2C194B" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+ <g class="octo-arm octo-arm-3" style="--angle:-1;--phase:-.7s"><path d="M146 232 C137 245 124 273 109 287 C94 302 77 293 74 281 C70 266 54 277 58 295 C63 326 90 334 113 318 C141 297 158 268 161 239 Z" fill="url(#octo-skin)"/></g>
+ <g class="octo-arm octo-arm-4" style="--angle:-1;--phase:-2s"><path d="M170 239 C158 267 149 290 138 302 C124 318 111 311 108 297 C106 283 91 285 90 300 C85 328 112 343 135 331 C157 319 179 281 183 243 Z" fill="url(#octo-skin)"/></g>
+ <g class="octo-arm octo-arm-5" style="--angle:1;--phase:-1.35s"><path d="M190 239 C202 267 211 290 222 302 C236 318 249 311 252 297 C254 283 269 285 270 300 C275 328 248 343 225 331 C203 319 181 281 177 243 Z" fill="url(#octo-skin)"/></g>
+ <g class="octo-arm octo-arm-6" style="--angle:1;--phase:-3s"><path d="M214 232 C223 245 236 273 251 287 C266 302 283 293 286 281 C290 266 306 277 302 295 C297 326 270 334 247 318 C219 297 202 268 199 239 Z" fill="url(#octo-skin)"/></g>
+</g>
+</svg>

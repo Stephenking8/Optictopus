@@ -1,0 +1,79 @@
+/* OPTICTOPUS 2D mascot — animation and expressions. Fully vector, no WebGL required. */
+.hero-art {overflow:visible}
+.hero-art .mascot-interactive {
+  width:min(91%,390px); aspect-ratio:360/350;
+  padding:0; position:relative; isolation:auto;
+  overflow:visible; animation:none !important; transform:none !important;
+  background:transparent; border:0; display:block; margin-inline:auto;
+  touch-action:manipulation; cursor:pointer;
+}
+.hero-art .mascot-interactive .mascot-float {
+  width:100%;height:100%;display:block;overflow:visible;
+  animation:none !important; filter:none !important;
+}
+.octo-flight,.octo-hover {display:block;width:100%;height:100%;transform-origin:50% 51%;will-change:transform;}
+.octo-hover {animation:octo-idle-float 4.2s ease-in-out infinite}
+.octo-figure {width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 17px 22px rgba(100,60,190,.22))}
+.octo-figure .octo-arm {transform-box:view-box;transform-origin:50% 65%;animation:octo-idle-arms var(--period,3.2s) ease-in-out var(--phase,0s) infinite alternate;will-change:transform}
+.octo-figure .octo-arm-1{transform-origin:119px 219px;--min:-7deg;--max:8deg;--period:3.7s}
+.octo-figure .octo-arm-2{transform-origin:136px 235px;--min:-5deg;--max:7deg;--period:3.3s}
+.octo-figure .octo-arm-3{transform-origin:146px 232px;--min:-7deg;--max:7deg;--period:3.1s}
+.octo-figure .octo-arm-4{transform-origin:170px 239px;--min:-8deg;--max:6deg;--period:2.8s}
+.octo-figure .octo-arm-5{transform-origin:190px 239px;--min:8deg;--max:-6deg;--period:2.8s}
+.octo-figure .octo-arm-6{transform-origin:214px 232px;--min:7deg;--max:-7deg;--period:3.1s}
+.octo-figure .octo-arm-7{transform-origin:224px 235px;--min:5deg;--max:-7deg;--period:3.3s}
+.octo-figure .octo-arm-8{transform-origin:241px 219px;--min:7deg;--max:-8deg;--period:3.7s}
+.octo-figure .octo-mantle {transform-box:view-box;transform-origin:180px 207px;animation:octo-breathe 4.15s ease-in-out infinite}
+@keyframes octo-idle-float {0%,100%{transform:translateY(6px) rotate(-1.3deg)}50%{transform:translateY(-10px) rotate(1.4deg)}}
+@keyframes octo-idle-arms {0%{transform:rotate(var(--min)) translateY(2px)}100%{transform:rotate(var(--max)) translateY(-2px)}}
+@keyframes octo-breathe {0%,100%{transform:scaleX(1) scaleY(1)}50%{transform:scaleX(1.012) scaleY(.988)}}
+@keyframes octo-tickle-body {0%,100%{transform:translateY(-4px) rotate(-5deg) scale(1.015)}50%{transform:translateY(-16px) rotate(5deg) scale(1.045)}}
+@keyframes octo-tickle-arms {0%{transform:rotate(calc(var(--min) - 10deg)) translateY(4px)}100%{transform:rotate(calc(var(--max) + 10deg)) translateY(-6px)}}
+@keyframes octo-swim-body {0%,100%{transform:translateY(3px) rotate(-5deg) scaleY(.97)}50%{transform:translateY(-6px) rotate(5deg) scaleY(1.04)}}
+@keyframes octo-swim-arms {0%{transform:rotate(calc(var(--min) - 16deg)) translateY(10px)}100%{transform:rotate(calc(var(--max) + 16deg)) translateY(-11px)}}
+.mascot-interactive.is-tickled .octo-hover {animation:octo-tickle-body .36s ease-in-out infinite}
+.mascot-interactive.is-tickled .octo-arm {animation:octo-tickle-arms .23s ease-in-out var(--phase,0s) infinite alternate}
+.mascot-interactive.is-swimming {pointer-events:none;animation:none !important;transform:none !important}
+.mascot-interactive.is-swimming .octo-hover {animation:octo-swim-body .31s ease-in-out infinite}
+.mascot-interactive.is-swimming .octo-arm {animation:octo-swim-arms .30s ease-in-out var(--phase,0s) infinite alternate}
+.mascot-interactive.is-swimming .octo-mantle{animation:octo-breathe .72s ease-in-out infinite}
+.octo-open-eyes [data-eye]{transform-box:view-box;transform:translate(var(--eye-x,0px),var(--eye-y,0px));transition:transform .16s ease-out}
+.octo-eye-closed,.octo-brow,.octo-confused-mark,.octo-mouth{display:none}
+.mascot-interactive[data-mouth="with"] .octo-mouth-happy{display:block}
+.mascot-interactive[data-mouth="with"][data-expression="smile"] .octo-mouth-happy,
+.mascot-interactive[data-mouth="with"][data-expression="confused"] .octo-mouth-happy,
+.mascot-interactive[data-mouth="with"][data-expression="mad"] .octo-mouth-happy {display:none}
+.mascot-interactive[data-mouth="with"][data-expression="smile"] .octo-mouth-smile,
+.mascot-interactive[data-mouth="with"][data-expression="confused"] .octo-mouth-confused,
+.mascot-interactive[data-mouth="with"][data-expression="mad"] .octo-mouth-mad {display:block}
+.mascot-interactive[data-expression="smile"] .octo-open-eyes{display:none}
+.mascot-interactive[data-expression="smile"] .octo-eye-closed-left,
+.mascot-interactive[data-expression="smile"] .octo-eye-closed-right {display:block}
+.mascot-interactive[data-expression="wink"] .octo-eye-left{display:none}
+.mascot-interactive[data-expression="wink"] .octo-eye-closed-left{display:block}
+.mascot-interactive[data-expression="confused"] .octo-brow-left,
+.mascot-interactive[data-expression="confused"] .octo-confused-mark{display:block}
+.mascot-interactive[data-expression="mad"] .octo-brow-left,
+.mascot-interactive[data-expression="mad"] .octo-brow-right{display:block}
+/* Ambient bubbles are brief, pointer-transparent and never affect page layout. */
+.octo-bubble {position:absolute;left:50%;top:46%;width:9px;height:9px;border:1.6px solid rgba(200,169,255,.72);border-radius:50%;z-index:5;pointer-events:none;animation:octo-bubble-drift 1.25s ease-out var(--delay,0ms) forwards}
+@keyframes octo-bubble-drift{0%{opacity:0;transform:translate(var(--dx,0px),22px) scale(.35)}25%{opacity:.85}100%{opacity:0;transform:translate(calc(var(--dx,0px)*1.6),-110px) scale(1.8)}}
+@media(max-width:800px){.hero-art .mascot-interactive{width:min(80%,300px)}}
+@media(max-width:600px){.hero-art .mascot-interactive{width:min(78%,255px)}}
+@media(prefers-reduced-motion:reduce){.octo-hover,.octo-figure .octo-arm,.octo-figure .octo-mantle{animation:none !important}.octo-open-eyes [data-eye]{transition:none}}
+[data-animations="off"] .octo-hover,[data-animations="off"] .octo-arm,[data-animations="off"] .octo-mantle{animation:none !important}
+/* Ensure the previously removed cursor light never reappears. */
+.cursor-aura{display:none !important}
+
+/* V7: cheerful mouth is shown in the default normal and wink states. */
+.mascot-interactive[data-mouth="with"][data-expression="normal"] .octo-mouth-happy,
+.mascot-interactive[data-mouth="with"][data-expression="wink"] .octo-mouth-happy {
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:octo-happy-grin 4.2s ease-in-out infinite;
+}
+@keyframes octo-happy-grin {0%,100%{transform:scale(1)}50%{transform:scale(1.05,1.08)}}
+@media(prefers-reduced-motion:reduce){
+  .mascot-interactive .octo-mouth-happy{animation:none !important}
+}
+[data-animations="off"] .octo-mouth-happy{animation:none !important}
