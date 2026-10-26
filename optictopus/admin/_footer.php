@@ -1,1 +1,0 @@
-</main><footer class="admin-bottom">Portfolio Control Center <span>© <?= date('Y') ?> · <?= e(setting('site_name')) ?></span></footer></div></div><script src="<?= e(url('assets/js/admin.js')) ?>?v=1.1" defer></script></body></html>

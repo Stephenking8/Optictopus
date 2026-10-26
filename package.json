@@ -1,0 +1,32 @@
+{
+  "name": "optictopus-mern",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "migrate": "npm run migrate -w server",
+    "test": "node --test tests/*.test.js",
+    "admin": "npm run admin -w server",
+    "test:browser": "node tests/browser.mjs",
+    "format": "prettier --write client/src server/src server/scripts tests",
+    "vercel-build": "npm run build && node scripts/vercel-assets.js",
+    "test:vercel": "node --test tests/vercel.test.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "concurrently": "^9.2.1",
+    "mongodb-memory-server": "^10.2.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.1.4"
+  }
+}

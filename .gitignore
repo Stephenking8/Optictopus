@@ -1,0 +1,10 @@
+node_modules/
+server/.env
+.env
+*.log
+.DS_Store
+# Keep the supplied private migration snapshot out of a public repository.
+server/data/legacy.json
+
+.vercel/
+client/dist/

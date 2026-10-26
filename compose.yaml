@@ -1,0 +1,26 @@
+services:
+  mongodb:
+    image: mongo:7
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/optictopus
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in a root .env file for Docker Compose}
+      NODE_ENV: development
+      PUBLIC_URL: http://localhost:5000
+    volumes:
+      - ./server/uploads:/app/server/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+volumes:
+  mongodb_data:
