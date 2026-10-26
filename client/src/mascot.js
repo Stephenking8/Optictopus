@@ -14,23 +14,22 @@ export function initMascot() {
   const pointer = {x:0,y:0,active:false,touchUntil:0};
   const still = () => reduced.matches || document.body.dataset.animations === 'off';
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  // Broad, short rounded arms follow the supplied baby-octopus silhouette.
   const arms = [
-    [[-68,78,-45],[-145,182,-65],[-205,22,-25],[-192,111,5]],
-    [[68,78,-45],[145,182,-65],[205,22,-25],[192,111,5]],
-    [[-78,98,-15],[-260,150,0],[-205,280,40],[-162,208,40]],
-    [[78,98,-15],[260,150,0],[205,280,40],[162,208,40]],
-    [[-48,112,35],[-190,246,70],[-90,320,80],[-67,242,65]],
-    [[48,112,35],[190,246,70],[90,320,80],[67,242,65]],
-    [[-20,116,70],[-110,290,115],[7,335,105],[-24,276,90]],
-    [[20,116,65],[128,270,100],[76,345,115],[50,292,95]],
+    [[-105,88,-12],[-156,163,-12],[-233,160,0],[-214,88,8]],
+    [[105,88,-12],[156,163,-12],[233,160,0],[214,88,8]],
+    [[-75,115,5],[-112,200,8],[-176,228,12],[-191,208,15]],
+    [[75,115,5],[112,200,8],[176,228,12],[191,208,15]],
+    [[-34,124,24],[-36,206,28],[-70,273,30],[-91,267,30]],
+    [[34,124,24],[36,206,28],[70,273,30],[91,267,30]],
   ];
   function curve(c,t) { const u=1-t; return [0,1,2].map(k=>u*u*u*c[0][k]+3*u*u*t*c[1][k]+3*u*t*t*c[2][k]+t*t*t*c[3][k]); }
   let head = [];
   function buildHead() {
     head=[];
-    const step=.065*density;
+    const step=.054*density;
     for(let lat=-Math.PI/2+.03;lat<Math.PI/2;lat+=step) {
-      const n=Math.max(8,Math.round(Math.cos(lat)*100/density));
+      const n=Math.max(8,Math.round(Math.cos(lat)*125/density));
       for(let i=0;i<n;i++) {
         const a=i/n*Math.PI*2;
         head.push({x:Math.cos(lat)*Math.cos(a),y:Math.sin(lat),z:Math.cos(lat)*Math.sin(a)});
@@ -76,7 +75,7 @@ export function initMascot() {
       const rx=x*Math.cos(yaw)+z*Math.sin(yaw), rz=z*Math.cos(yaw)-x*Math.sin(yaw);
       const ry=y*Math.cos(pitch)-rz*Math.sin(pitch), zz=rz*Math.cos(pitch)+y*Math.sin(pitch);
       const scale=680/(680-zz);
-      return {x:300+(rx*Math.cos(tilt)-ry*Math.sin(tilt))*scale*squash,y:205+(rx*Math.sin(tilt)+ry*Math.cos(tilt))*scale/squash+bob,z:zz,scale};
+      return {x:300+(rx*Math.cos(tilt)-ry*Math.sin(tilt))*scale*squash,y:190+(rx*Math.sin(tilt)+ry*Math.cos(tilt))*scale/squash+bob,z:zz,scale};
     };
     ctx.clearRect(0,0,600,600);
     const light=document.documentElement.dataset.theme==='light';
@@ -91,16 +90,17 @@ export function initMascot() {
       const illumination=clamp(-nx*.4-ny*.65+nz*.65,0,1);
       dots.push({...p,r:r*p.scale,bright:light?26+illumination*38:23+illumination*65,alpha:opacity*(.45+illumination*.55)});
     }
-    for(let arm=0;arm<8;arm++) {
+    for(let arm=0;arm<arms.length;arm++) {
       const c=arms[arm], step=.021*density;
       for(let t=0;t<1;t+=step) {
         const p=curve(c,t), next=curve(c,Math.min(1,t+.005));
         const dx=next[0]-p[0],dy=next[1]-p[1],len=Math.hypot(dx,dy)||1;
-        const wave=quiet?0:Math.sin(time*(1.1+arm*.065)-t*5+arm)*t*10;
+        const wave=quiet?0:Math.sin(time*(1.1+arm*.065)-t*5+arm)*t*5;
         p[0]+=wave; p[1]+=quiet?0:Math.cos(time*1.3+arm+t*4)*t*5;
         if(angry){p[0]*=1-.17*t*settle;p[1]-=t*24*settle;}
         if(!quiet&&(happy||playful))p[0]+=Math.sin(age*9+arm+t*4)*t*7*Math.exp(-age*.6);
-        const radius=24*Math.pow(1-t,.8)+2;
+        const cap=t<.84?1:Math.sqrt(Math.max(0,1-((t-.84)/.16)**2));
+        const radius=(38-12*t)*cap;
         for(let a=-Math.PI/2;a<=Math.PI/2;a+=.27*density) {
           const side=Math.sin(a),front=Math.cos(a);
           surface(p[0]-dy/len*side*radius,p[1]+dx/len*side*radius,p[2]+front*radius,-dy/len*side,dx/len*side,front,1.45+(1-t)*.4);
@@ -110,9 +110,9 @@ export function initMascot() {
     for(const p of head) {
       if(p.z<-.12)continue;
       // Large eye sockets are negative space in the curved surface.
-      const socket=p.z>.68 && [ -1,1 ].some(side=>((p.x-side*.32)/.19)**2+((p.y-.22)/.28)**2<1);
+      const socket=p.z>.68 && [ -1,1 ].some(side=>((p.x-side*.43)/.13)**2+((p.y-.20)/.145)**2<1);
       if(socket)continue;
-      surface(p.x*132,p.y*126,p.z*112,p.x,p.y,p.z,1.3+Math.max(0,p.z)*.55);
+      surface(p.x*163,p.y*147,p.z*112,p.x,p.y,p.z,1.3+Math.max(0,p.z)*.55);
     }
     dots.sort((a,b)=>a.z-b.z);
     for(const p of dots){ctx.fillStyle=`hsla(270,90%,${p.bright}%,${p.alpha})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
@@ -121,18 +121,23 @@ export function initMascot() {
     }
     // Dense luminous dotted eyes; expression geometry is independent of head geometry.
     for(const side of [-1,1]) {
-      const ex=side*42+gaze.x*9, ey=27+gaze.y*8;
+      const ex=side*67+gaze.x*7, ey=29+gaze.y*6;
       const blink=!quiet && now<blinkUntil && (!wink||side===1);
       const closed=blink || (playful&&side===1&&age<.9);
       if(happy||closed) {
         for(let i=0;i<=12;i++){const u=i/12;faceDot(ex-12+u*24,ey+(happy?-Math.sin(u*Math.PI)*10:0),2.2);}
       } else {
-        const height=angry?5:22;
-        for(let y=-height;y<=height;y+=3.4)for(let x=-5;x<=5;x+=3.4){if((x/7)**2+(y/(height+3))**2<=1)faceDot(ex+x,ey+y+(angry?side*x*.4:0),2.05);}
+        const height=angry?5:17;
+        for(let y=-height;y<=height;y+=3.2)for(let x=-17;x<=17;x+=3.2){
+          if((x/18)**2+(y/(height+1))**2<=1) {
+            const p=project(ex+x,ey+y+(angry?side*x*.3:0),114);
+            ctx.fillStyle=light?'#31114e':'#18082e';ctx.beginPath();ctx.arc(p.x,p.y,2.1*p.scale,0,Math.PI*2);ctx.fill();
+          }
+        }
+        if(!angry){faceDot(ex-5,ey-7,2.6,.95);faceDot(ex-2,ey-4,1.5,.6);}
       }
       if(angry)for(let i=0;i<9;i++)faceDot(ex-14+i*3.5,ey-18+side*(i-4)*1.6,2);
     }
-    if(happy)for(let i=0;i<=20;i++){const u=i/20;faceDot(-17+u*34,61+Math.sin(u*Math.PI)*9,1.8);}
     if(!quiet && emotion!=='neutral' && age<1.2) {
       for(let i=0;i<36;i++){const a=i/36*Math.PI*2,rad=150+age*110;ctx.fillStyle=`rgba(185,112,255,${(1-age/1.2)*.5})`;ctx.beginPath();ctx.arc(300+Math.cos(a)*rad,270+Math.sin(a)*rad*.85,1.8,0,Math.PI*2);ctx.fill();}
     }
