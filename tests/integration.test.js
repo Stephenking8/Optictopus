@@ -290,6 +290,18 @@ test("settings persist and reject unsafe asset paths", async () => {
     "Test headline",
   );
 });
+test("gallery and testimonials persist with separate visibility and validated content", async () => {
+  const data = {section_gallery:"1",section_testimonials:"0",gallery_items:JSON.stringify([{image:"assets/img/favicon.svg",caption:"Sample gallery"}]),testimonial_items:JSON.stringify([{name:"Test client",role:"Reviewer",quote:"A sample review."}])};
+  const saved = await admin.put('/api/admin/settings').set('X-CSRF-Token',adminCsrf).send({settings:data});
+  assert.equal(saved.status,200);
+  const site = (await guest.get('/api/site')).body.settings;
+  for(const [key,value] of Object.entries(data)) assert.equal(site[key],value);
+  const invalid = await admin.put('/api/admin/settings').set('X-CSRF-Token',adminCsrf).send({settings:{gallery_items:JSON.stringify([{image:"javascript:alert(1)",caption:""}])}});
+  assert.equal(invalid.status,422);
+  const hidden = await admin.put('/api/admin/settings').set('X-CSRF-Token',adminCsrf).send({settings:{section_gallery:"0",section_testimonials:"1"}});
+  assert.equal(hidden.status,200);
+  assert.equal((await guest.get('/api/site')).body.settings.gallery_items,data.gallery_items);
+});
 test("password update works and logout invalidates current session", async () => {
   const updatedPassword = randomBytes(24).toString("hex");
   let r = await admin

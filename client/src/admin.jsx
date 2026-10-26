@@ -23,6 +23,8 @@ const toggles = [
   "section_about",
   "section_projects",
   "section_contact",
+  "section_gallery",
+  "section_testimonials",
   "show_views",
   "show_likes",
   "show_rating",
@@ -884,6 +886,28 @@ function CategoryRow({ category: c, refresh, notice }) {
     </div>
   );
 }
+function SectionEditor({ kind, value, onChange, onBusy, onMessage }) {
+  const items = JSON.parse(value || "[]"), gallery = kind === "gallery";
+  const update = (i, key, v) => onChange(JSON.stringify(items.map((item,n) => n === i ? {...item,[key]:v} : item)));
+  const addImage = async file => {
+    if (!file || items.length >= 30) return;
+    onBusy(true);
+    try { const image = await upload(file); onChange(JSON.stringify([...items,{image,caption:""}])); onMessage("Image added. Save website settings to publish."); }
+    catch(e) { onMessage(e.message); } finally { onBusy(false); }
+  };
+  return <section className="admin-panel"><h2>{gallery ? "Gallery" : "Testimonials"}</h2>
+    <p>Add up to 30 items. Use Visibility & features to show or hide this section. Save website settings to apply changes.</p>
+    {items.map((item,i) => <div className="section-editor-item" key={i}>
+      {gallery ? <><img className="asset-preview" src={asset(item.image)} alt={item.caption || "Gallery preview"} /><label>Caption<input value={item.caption} maxLength={500} onChange={e=>update(i,"caption",e.target.value)} /></label></> : <>
+        <label>Name<input required value={item.name} maxLength={500} onChange={e=>update(i,"name",e.target.value)} /></label>
+        <label>Role or company<input value={item.role} maxLength={500} onChange={e=>update(i,"role",e.target.value)} /></label>
+        <label>Testimonial<textarea required value={item.quote} maxLength={1500} onChange={e=>update(i,"quote",e.target.value)} /></label>
+      </>}
+      <button type="button" className="button" onClick={()=>onChange(JSON.stringify(items.filter((_,n)=>n!==i)))}>Remove {gallery?"image":"testimonial"} {i+1}</button>
+    </div>)}
+    {gallery ? <label>Add gallery image<input type="file" accept="image/png,image/jpeg,image/webp" disabled={items.length>=30} onChange={e=>{addImage(e.target.files[0]);e.target.value="";}} /></label> : <button className="button" type="button" disabled={items.length>=30} onClick={()=>onChange(JSON.stringify([...items,{name:"",role:"",quote:""}]))}>Add testimonial</button>}
+  </section>;
+}
 export function Settings() {
   const { settings, socials, refresh } = useSite(),
     [form, setForm] = useState({ ...settings }),
@@ -939,6 +963,8 @@ export function Settings() {
                       "layout_style",
                       "background_style",
                       "retention_days",
+                      "gallery_items",
+                      "testimonial_items",
                     ].includes(k),
                 )
                 .map((k) => (
@@ -1077,6 +1103,8 @@ export function Settings() {
             </section>
           </div>
         </div>
+        <SectionEditor kind="gallery" value={form.gallery_items} onChange={v=>set("gallery_items",v)} onBusy={setBusy} onMessage={setMessage} />
+        <SectionEditor kind="testimonials" value={form.testimonial_items} onChange={v=>set("testimonial_items",v)} onBusy={setBusy} onMessage={setMessage} />
         <div className="admin-panel">
           <button className="button button-primary" disabled={busy}>
             {busy ? "Saving…" : "Save website settings →"}

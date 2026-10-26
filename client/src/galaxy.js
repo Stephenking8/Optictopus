@@ -1,115 +1,41 @@
-/* OPTICTOPUS 2D — galaxy-only decoration; no cursor light, no WebGL. */
+// Layered stars respond gently to scrolling and pointer movement.
 export function initGalaxy() {
-  const removers = [];
-  const on = (el, event, fn, options) => {
-    el.addEventListener(event, fn, options);
-    removers.push(() => el.removeEventListener(event, fn, options));
-  };
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const body = document.body;
-  const motion = body.dataset.animations !== "off" && !reduce;
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const galaxy = document.querySelector("[data-galaxy-sky]");
-  const mascot = document.querySelector("[data-mascot]");
-  const canvas = mascot?.querySelector("[data-octo-canvas]");
-
-  // Galaxy-style constellation field. One paint per viewport size, never intercepts taps/clicks.
-  if (galaxy) {
-    const ctx = galaxy.getContext("2d", { alpha: true });
-    function drawSky() {
-      const w = window.innerWidth,
-        h = window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      galaxy.width = Math.round(w * dpr);
-      galaxy.height = Math.round(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
-      let seed = 51987;
-      const random = () => {
-        seed = (seed * 16807) % 2147483647;
-        return (seed - 1) / 2147483646;
-      };
-      const stars = [];
-      const count = Math.round(clamp((w * h) / 13000, 35, 105));
-      for (let i = 0; i < count; i++) {
-        const x = random() * w,
-          y = random() * h,
-          radius = random() > 0.95 ? 1.65 : random() * 0.9 + 0.28;
-        stars.push({ x, y, radius });
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(179,142,251,${(0.1 + random() * 0.42).toFixed(3)})`;
-        ctx.fill();
-      }
-      // Uneven, sweeping galactic paths, not a repeating grid or dot matrix.
-      const contours = Math.max(2, Math.min(5, Math.round(w / 390)));
-      for (let i = 0; i < contours; i++) {
-        const y = h * (0.25 + i * 0.16),
-          amp = 25 + i * 13;
-        ctx.beginPath();
-        ctx.moveTo(-60, y);
-        ctx.bezierCurveTo(
-          w * 0.21,
-          y + amp * 1.5,
-          w * 0.36,
-          y - amp * 1.5,
-          w * 0.52,
-          y - amp * 0.7,
-        );
-        ctx.bezierCurveTo(
-          w * 0.7,
-          y + amp * 1.7,
-          w * 0.8,
-          y - amp * 1.2,
-          w + 60,
-          y - amp * 0.45,
-        );
-        ctx.strokeStyle = `rgba(146,98,236,${(i % 2 ? 0.065 : 0.12).toFixed(3)})`;
-        ctx.lineWidth = i === 2 ? 1.15 : 0.75;
-        ctx.stroke();
-      }
-      // A handful of faint constellation connectors and orbital node-rings.
-      for (let i = 0; i < stars.length; i++) {
-        if (i % 8 !== 0) continue;
-        let closest = null,
-          dist = 200;
-        for (let j = i + 1; j < stars.length; j++) {
-          const d = Math.hypot(
-            stars[i].x - stars[j].x,
-            stars[i].y - stars[j].y,
-          );
-          if (d < dist) {
-            dist = d;
-            closest = stars[j];
-          }
-        }
-        if (closest) {
-          ctx.beginPath();
-          ctx.moveTo(stars[i].x, stars[i].y);
-          ctx.lineTo(closest.x, closest.y);
-          ctx.strokeStyle = "rgba(171,127,244,.12)";
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-        ctx.beginPath();
-        ctx.arc(stars[i].x, stars[i].y, stars[i].radius + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(182,145,250,.22)";
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-      }
-    }
-    let refresh = 0;
-    on(
-      window,
-      "resize",
-      () => {
-        clearTimeout(refresh);
-        refresh = setTimeout(drawSky, 150);
-      },
-      { passive: true },
-    );
-    drawSky();
+  const canvas = document.querySelector('[data-galaxy-sky]');
+  const ctx = canvas?.getContext('2d');
+  if (!ctx) return () => {};
+  const media = matchMedia('(prefers-reduced-motion: reduce)');
+  let frame, w=0, h=0, stars=[], last=0, elapsed=0, x=0, y=0;
+  const target={x:0,y:0};
+  const motion=()=>!media.matches && document.body.dataset.animations!=='off';
+  function resize(){
+    w=innerWidth;h=innerHeight;const dpr=Math.min(devicePixelRatio||1,1.5);
+    canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    let seed=51987;const random=()=>{seed=seed*16807%2147483647;return(seed-1)/2147483646;};
+    stars=Array.from({length:Math.min(100,Math.max(40,Math.round(w*h/12000)))},()=>({x:random()*w,y:random()*h,z:.3+random()*.7,r:.4+random()*1.3,phase:random()*6.28}));restart();
   }
-
-  return () => removers.forEach((fn) => fn());
+  function draw(now){
+    frame=undefined;if(document.hidden)return;
+    const active=motion(),dt=last?Math.min((now-last)/1000,.05):0;last=now;
+    if(active)elapsed+=dt;
+    x+=(target.x-x)*.06;y+=(target.y-y)*.06;
+    ctx.clearRect(0,0,w,h);
+    const wrap=(v,max)=>(v%max+max)%max;
+    for(const s of stars){
+      const px=wrap(s.x+(active?x*s.z+Math.sin(elapsed*.22+s.phase)*8:0)+20,w+40)-20;
+      const py=wrap(s.y-(active?elapsed*(3+s.z*7)+scrollY*.055*s.z-y*s.z:0)+20,h+40)-20;
+      ctx.beginPath();ctx.arc(px,py,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(190,150,255,${.15+s.z*.45})`;ctx.fill();
+    }
+    for(let i=0;i<4;i++){
+      const py=h*(.2+i*.2)+(active?Math.sin(elapsed*.15+i)*10+y*.2-Math.sin(scrollY*.0005)*35:0);
+      ctx.beginPath();ctx.moveTo(-50,py);ctx.bezierCurveTo(w*.3,py-70,w*.55,py+70,w+50,py-25);
+      ctx.strokeStyle='rgba(160,110,240,.09)';ctx.lineWidth=.8;ctx.stroke();
+    }
+    if(active)frame=requestAnimationFrame(draw);
+  }
+  function restart(){cancelAnimationFrame(frame);last=0;frame=requestAnimationFrame(draw);}
+  function pointer(e){target.x=(e.clientX/Math.max(1,w)-.5)*24;target.y=(e.clientY/Math.max(1,h)-.5)*18;}
+  const observer=new MutationObserver(restart);observer.observe(document.body,{attributes:true,attributeFilter:['data-animations','data-background']});
+  window.addEventListener('resize',resize);window.addEventListener('pointermove',pointer,{passive:true});document.addEventListener('visibilitychange',restart);media.addEventListener('change',restart);resize();
+  return()=>{cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('resize',resize);window.removeEventListener('pointermove',pointer);document.removeEventListener('visibilitychange',restart);media.removeEventListener('change',restart);};
 }

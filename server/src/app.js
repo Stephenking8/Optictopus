@@ -683,6 +683,21 @@ export function createApp({
     for (const [k, v] of rows) {
       if (typeof v !== "string" || v.length > 20000)
         throw fail(422, "Invalid setting value.");
+      if (["section_gallery", "section_testimonials"].includes(k) && !["0", "1"].includes(v))
+        throw fail(422, "Invalid section visibility.");
+      if (["gallery_items", "testimonial_items"].includes(k)) {
+        let items;
+        try { items = JSON.parse(v); } catch { throw fail(422, "Invalid section content."); }
+        if (!Array.isArray(items) || items.length > 30) throw fail(422, "Use up to 30 items per section.");
+        for (const item of items) {
+          if (!item || typeof item !== "object" || Array.isArray(item)) throw fail(422, "Invalid section item.");
+          const fields = k === "gallery_items" ? ["image", "caption"] : ["name", "role", "quote"];
+          if (Object.keys(item).some(key => !fields.includes(key)) || fields.some(key => typeof item[key] !== "string" || item[key].length > (key === "quote" ? 1500 : 500)))
+            throw fail(422, "Invalid section fields.");
+          if (k === "gallery_items" && (!item.image || !asset(item.image))) throw fail(422, "Upload a valid gallery image.");
+          if (k === "testimonial_items" && (!item.name.trim() || !item.quote.trim())) throw fail(422, "Testimonials need a name and quote.");
+        }
+      }
       if (k.endsWith("_image") && !asset(v))
         throw fail(422, "Invalid image path.");
       if (k === "accent_color" && !/^#[a-f0-9]{6}$/i.test(v))
@@ -721,7 +736,7 @@ export function createApp({
         );
     }
     for (const [key, value] of rows)
-      await M.Setting.updateOne({ key }, { $set: { value } });
+      await M.Setting.updateOne({ key }, { $set: { value } }, { upsert: true });
     for (const x of socials)
       await M.Social.updateOne(
         { platform: x.platform },

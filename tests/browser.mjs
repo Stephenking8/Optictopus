@@ -111,6 +111,28 @@ try {
       .getByText("Loading…", { exact: true })
       .waitFor({ state: "hidden" });
   }
+  await page.goto(base + "/admin/settings");
+  await page.getByLabel("Section gallery", {exact:true}).check();
+  await page.getByLabel("Section testimonials", {exact:true}).check();
+  await page.getByLabel("Add gallery image", {exact:true}).setInputFiles({name:"gallery.png",mimeType:"image/png",buffer:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3foAAAAASUVORK5CYII=","base64")});
+  await page.getByLabel("Caption",{exact:true}).fill("Gallery test image");
+  await page.getByRole("button",{name:"Add testimonial",exact:true}).click();
+  await page.getByLabel("Name",{exact:true}).fill("Browser test reviewer");
+  await page.getByLabel("Role or company",{exact:true}).fill("Test only");
+  await page.getByLabel("Testimonial",{exact:true}).fill("A review used only by automated tests.");
+  await page.getByRole("button",{name:"Save website settings →",exact:true}).click();
+  await page.getByText("Website settings saved.",{exact:true}).waitFor();
+  await page.goto(base);
+  await page.locator('#gallery').getByText("Gallery test image").waitFor();
+  await page.locator('#testimonials').getByText("Browser test reviewer").waitFor();
+  await page.goto(base + "/admin/settings");
+  await page.getByLabel("Section gallery",{exact:true}).uncheck();
+  await page.getByRole("button",{name:"Save website settings →",exact:true}).click();
+  await page.getByText("Website settings saved.",{exact:true}).waitFor();
+  await page.goto(base);
+  await page.locator('#testimonials').waitFor();
+  assert.equal(await page.locator('#gallery').count(),0);
+  assert.equal(await page.locator('[data-mascot]').evaluate(el=>getComputedStyle(el).webkitTapHighlightColor),'rgba(0, 0, 0, 0)');
   await page.goto(base + "/admin/projects/new");
   await page
     .getByLabel("Title", { exact: true })

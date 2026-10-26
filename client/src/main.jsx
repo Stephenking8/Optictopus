@@ -308,6 +308,25 @@ function Mascot() {
     </button>
   </>;
 }
+function ExtraSections() {
+  const { settings: s } = useSite();
+  const parse = value => { try { return JSON.parse(value || "[]"); } catch { return []; } };
+  const gallery = parse(s.gallery_items), testimonials = parse(s.testimonial_items);
+  return <>
+    {s.section_gallery === "1" && <section className="section-space portfolio-gallery" id="gallery"><div className="container">
+      <p className="eyebrow">A closer look</p><h2>Gallery<span className="accent">.</span></h2>
+      <div className="gallery-grid">{gallery.map((item, i) => <figure key={i}>
+        <a href={asset(item.image)} target="_blank" rel="noreferrer" aria-label={item.caption || `View gallery image ${i + 1}`}><img src={asset(item.image)} alt={item.caption || `Gallery image ${i + 1}`} loading="lazy" /></a>
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </figure>)}</div>{!gallery.length && <p className="section-empty">New moments coming soon.</p>}
+    </div></section>}
+    {s.section_testimonials === "1" && <section className="section-space portfolio-testimonials" id="testimonials"><div className="container">
+      <p className="eyebrow">Words from others</p><h2>Testimonials<span className="accent">.</span></h2>
+      <div className="testimonials-grid">{testimonials.map((item,i) => <figure key={i}><blockquote>{item.quote}</blockquote><figcaption><strong>{item.name}</strong>{item.role && <span>{item.role}</span>}</figcaption></figure>)}</div>
+      {!testimonials.length && <p className="section-empty">Testimonials will appear here when available.</p>}
+    </div></section>}
+  </>;
+}
 export function Feedback({ project: p, onChange }) {
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
@@ -577,6 +596,7 @@ function Home() {
           </div>
         </section>
       )}
+      <ExtraSections />
     </>
   );
 }

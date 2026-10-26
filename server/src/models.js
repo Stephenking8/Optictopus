@@ -160,9 +160,9 @@ export const models = {
   rate_limits: LegacyLimit,
 };
 export async function settings() {
-  return Object.fromEntries(
+  return { section_gallery: "0", section_testimonials: "0", gallery_items: "[]", testimonial_items: "[]", ...Object.fromEntries(
     (await Setting.find().lean()).map((x) => [x.key, x.value]),
-  );
+  ) };
 }
 export const publicFilter = {
   publication: "published",

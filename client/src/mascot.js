@@ -46,7 +46,7 @@ export function initMascot() {
     const now=performance.now();
     if(emotion==='angry') return;
     taps=taps.filter(t=>now-t<3000); taps.push(now);
-    setEmotion(taps.length>=4?'angry':taps.length>=2?'playful':'happy');
+    setEmotion(taps.length>=3?'angry':taps.length>=2?'playful':'happy');
   }
   function render(now) {
     const quiet=still(), dt=last?Math.min((now-last)/1000,.04):0;
