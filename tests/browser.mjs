@@ -47,6 +47,19 @@ try {
   await page.mouse.move(box.x + box.width * .65, box.y + box.height * .4);
   await page.locator('[data-mascot]').click();
   assert.notDeepEqual(await mascot.screenshot(), initialDots, 'dots react to pointer and tap');
+  assert.equal(await page.locator('[data-mascot]').getAttribute('data-expression'), 'happy');
+  await page.locator('[data-mascot]').click();
+  assert.equal(await page.locator('[data-mascot]').getAttribute('data-expression'), 'playful');
+  await page.locator('[data-mascot]').click();
+  await page.locator('[data-mascot]').click();
+  assert.equal(await page.locator('[data-mascot]').getAttribute('data-expression'), 'angry');
+  await page.waitForTimeout(3200);
+  assert.equal(await page.locator('[data-mascot]').getAttribute('data-expression'), 'neutral');
+  assert.equal(await page.locator('.mascot-hint').count(), 0);
+  assert.equal(await page.locator('header .site-visits').count(), 1);
+  assert.equal(await page.locator('.project-image .status-badge').count(), 0);
+  assert.ok(await page.locator('.project-body .eyebrow + .status-badge').count() > 0);
+
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.waitForTimeout(100);
   const stillDots = await mascot.screenshot();

@@ -144,6 +144,7 @@ function PublicLayout() {
         <canvas className="galaxy-sky" data-galaxy-sky aria-hidden="true" />
         <header className="site-header" id="top">
           <nav className="nav-wrap container">
+            <div className="brand-with-visits">
             <Link className="wordmark" to="/">
               <img
                 className="brand-logo"
@@ -152,6 +153,10 @@ function PublicLayout() {
               />
               <span>{s.site_name}</span>
             </Link>
+            {Number.isFinite(visits) && <span className="site-visits" title="Recorded page visits, including imported history. New visits are counted only with analytics consent.">
+              <span aria-hidden="true">◉</span> <strong>{visits.toLocaleString()}</strong> site visits
+            </span>}
+            </div>
             <div className={"nav-links " + (menu ? "open" : "")} id="main-menu">
               <Link to="/">Home</Link>
               {s.section_about === "1" && <Link to="/#about">About</Link>}
@@ -230,9 +235,7 @@ function PublicLayout() {
             </div>
           )}
           <div className="container footer-bottom">
-            {Number.isFinite(visits) && <span className="site-visits" title="Recorded page visits, including imported history. New visits are counted only with analytics consent.">
-              <span aria-hidden="true">◉</span> <strong>{visits.toLocaleString()}</strong> site visits
-            </span>}
+
             <span>
               © {new Date().getFullYear()} {s.site_name} · {s.footer_text}
             </span>
@@ -300,10 +303,9 @@ function Mascot() {
   useEffect(() => initMascot(), []);
   return <>
     <button className="mascot-interactive particle-octopus" type="button" data-mascot
-      aria-label="Purple dotted octopus: move your pointer to guide its eyes, or tap to ripple">
+      aria-label="Interactive purple octopus: click or tap for a reaction">
       <canvas aria-hidden="true" />
     </button>
-    <span className="mascot-hint">✦ MOVE TO EXPLORE · TAP TO RIPPLE</span>
   </>;
 }
 export function Feedback({ project: p, onChange }) {
@@ -528,6 +530,13 @@ function Home() {
                         alt={p.title}
                         loading="lazy"
                       />
+
+                    </Link>
+                    <div className="project-body">
+                      <p className="eyebrow">
+                        {p.category_name}
+                        {p.is_featured ? " · FEATURED" : ""}
+                      </p>
                       <span
                         className={
                           "status-badge status-" + p.development_status
@@ -535,12 +544,6 @@ function Home() {
                       >
                         {p.development_status}
                       </span>
-                    </Link>
-                    <div className="project-body">
-                      <p className="eyebrow">
-                        {p.category_name}
-                        {p.is_featured ? " · FEATURED" : ""}
-                      </p>
                       <h3>
                         <Link to={"/project/" + p.slug}>{p.title} ↗</Link>
                       </h3>

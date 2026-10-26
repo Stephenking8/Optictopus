@@ -499,3 +499,10 @@
 .site-visits { display: inline-flex; align-items: center; gap: .45rem; font-variant-numeric: tabular-nums; }
 .site-visits > span { color: #b47cf5; }
 .site-visits strong { color: var(--text); }
+
+.brand-with-visits { display:flex; align-items:center; gap:1rem; flex-shrink:0; }
+.site-header .site-visits { font-size:.68rem; color:var(--muted); white-space:nowrap; border-left:1px solid rgba(170,130,230,.2); padding-left:1rem; }
+.project-body .status-badge { position:static; display:inline-flex; width:fit-content; margin:0 0 .75rem; padding:.25rem .6rem; border-radius:999px; font-size:.7rem; line-height:1.4; text-transform:capitalize; background:rgba(166,112,235,.13); color:var(--text); }
+.project-body > .eyebrow { margin-bottom:.45rem; }
+.particle-octopus { touch-action:manipulation; }
+@media(max-width:600px) { .brand-with-visits {gap:.45rem;} .site-header .site-visits {font-size:.56rem;gap:.2rem;padding-left:.45rem;} .wordmark {gap:.3rem;font-size:.85rem;} }
