@@ -492,3 +492,10 @@
     transition: none;
   }
 }
+
+/* Dotted mascot remains crisp at every viewport size. */
+.hero-art .particle-octopus { aspect-ratio: 1; }
+.particle-octopus canvas { display: block; width: 100%; height: 100%; }
+.site-visits { display: inline-flex; align-items: center; gap: .45rem; font-variant-numeric: tabular-nums; }
+.site-visits > span { color: #b47cf5; }
+.site-visits strong { color: var(--text); }

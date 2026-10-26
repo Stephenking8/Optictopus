@@ -223,6 +223,7 @@ export function createApp({
   app.get("/api/site", async (req, res) =>
     res.json({
       settings: await M.settings(),
+      visits: await M.Visit.countDocuments(),
       socials: (await M.Social.find().lean()).map(clean),
       categories: (
         await M.Category.find().sort({ sort_order: 1, name: 1 }).lean()

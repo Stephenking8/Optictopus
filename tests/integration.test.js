@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import mongoose from "mongoose";
@@ -8,7 +9,7 @@ import { createApp } from "../server/src/app.js";
 import { migrate } from "../server/scripts/migrate.js";
 import * as M from "../server/src/models.js";
 let mongo, app, guest, admin, csrf, adminCsrf;
-const password = "Integration-Test-Password-2026";
+const password = randomBytes(24).toString("hex");
 before(async () => {
   mongo = await MongoMemoryServer.create({
     instance: { args: ["--nounixsocket"] },
@@ -17,7 +18,7 @@ before(async () => {
   await migrate();
   app = createApp({
     mongoUrl: mongo.getUri(),
-    secret: "integration-only-secret-with-more-than-32-characters",
+    secret: randomBytes(32).toString("hex"),
   });
   guest = request.agent(app);
   admin = request.agent(app);
@@ -290,16 +291,26 @@ test("settings persist and reject unsafe asset paths", async () => {
   );
 });
 test("password update works and logout invalidates current session", async () => {
+  const updatedPassword = randomBytes(24).toString("hex");
   let r = await admin
     .put("/api/admin/password")
     .set("X-CSRF-Token", adminCsrf)
     .send({
       current: password,
-      password: "Another-Strong-Password-2026",
-      repeat: "Another-Strong-Password-2026",
+      password: updatedPassword,
+      repeat: updatedPassword,
     });
   assert.equal(r.status, 200);
   assert.equal((await admin.get("/api/admin/projects")).status, 200);
   await post(admin, "/logout", {}, adminCsrf);
   assert.equal((await admin.get("/api/admin/projects")).status, 401);
+});
+
+test("public visit total matches recorded history without exposing visitor data", async () => {
+  const before = await M.Visit.countDocuments();
+  const response = await guest.get('/api/site');
+  assert.equal(response.status, 200);
+  assert.equal(response.body.visits, before);
+  assert.equal(await M.Visit.countDocuments(), before);
+  assert.equal(response.body.visitor_hash, undefined);
 });

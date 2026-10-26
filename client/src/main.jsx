@@ -20,7 +20,7 @@ import {
 import { api, session, asset, link } from "./api";
 import { initMascot } from "./mascot";
 import { initGalaxy } from "./galaxy";
-import mascotSvg from "./mascot.svg?raw";
+
 import socialSvg from "./socials.svg?raw";
 import {
   AdminLayout,
@@ -106,7 +106,7 @@ function App() {
   );
 }
 function PublicLayout() {
-  const { settings: s, socials } = useSite(),
+  const { settings: s, socials, visits } = useSite(),
     [menu, setMenu] = useState(false),
     [theme, setTheme] = useState(document.documentElement.dataset.theme),
     [consent, setConsent] = useState(localStorage.getItem("portfolio_consent"));
@@ -230,6 +230,9 @@ function PublicLayout() {
             </div>
           )}
           <div className="container footer-bottom">
+            {Number.isFinite(visits) && <span className="site-visits" title="Recorded page visits, including imported history. New visits are counted only with analytics consent.">
+              <span aria-hidden="true">◉</span> <strong>{visits.toLocaleString()}</strong> site visits
+            </span>}
             <span>
               © {new Date().getFullYear()} {s.site_name} · {s.footer_text}
             </span>
@@ -295,29 +298,13 @@ function Track({ id }) {
 }
 function Mascot() {
   useEffect(() => initMascot(), []);
-  return (
-    <>
-      <button
-        className="mascot-interactive"
-        type="button"
-        data-mascot
-        data-mouth="with"
-        data-expression="normal"
-        data-auto-expressions="on"
-        aria-label="Tickle OPTICTOPUS or tap three times to make it swim"
-      >
-        <span className="mascot-float">
-          <span className="octo-flight" data-octo-flight>
-            <span
-              className="octo-hover"
-              dangerouslySetInnerHTML={{ __html: mascotSvg }}
-            />
-          </span>
-        </span>
-      </button>
-      <span className="mascot-hint">✦ TICKLE ME · TAP 3 TIMES TO SWIM</span>
-    </>
-  );
+  return <>
+    <button className="mascot-interactive particle-octopus" type="button" data-mascot
+      aria-label="Purple dotted octopus: move your pointer to guide its eyes, or tap to ripple">
+      <canvas aria-hidden="true" />
+    </button>
+    <span className="mascot-hint">✦ MOVE TO EXPLORE · TAP TO RIPPLE</span>
+  </>;
 }
 export function Feedback({ project: p, onChange }) {
   const [busy, setBusy] = useState(false),

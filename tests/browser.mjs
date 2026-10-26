@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { chromium } from "playwright";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
@@ -6,6 +7,7 @@ import assert from "node:assert/strict";
 import { createApp } from "../server/src/app.js";
 import { migrate } from "../server/scripts/migrate.js";
 import { Admin } from "../server/src/models.js";
+const browserPassword = randomBytes(24).toString("hex");
 const mongo = await MongoMemoryServer.create({
   instance: { args: ["--nounixsocket"] },
 });
@@ -14,11 +16,11 @@ await migrate();
 await Admin.create({
   id: 99,
   username: "browser-test",
-  password_hash: await bcrypt.hash("Browser-Only-Password-2026", 4),
+  password_hash: await bcrypt.hash(browserPassword, 4),
 });
 const app = createApp({
   mongoUrl: mongo.getUri(),
-  secret: "browser-only-secret-with-more-than-32-characters",
+  secret: randomBytes(32).toString("hex"),
 });
 const server = app.listen(0);
 await new Promise((r) => server.once("listening", r));
@@ -38,7 +40,20 @@ try {
     .getByRole("heading", { name: "See beyond. Build beyond." })
     .waitFor();
   await page.locator(".project-card").first().waitFor();
-  assert.equal(await page.locator("[data-mascot] svg").count(), 1);
+  assert.equal(await page.locator("[data-mascot] canvas").count(), 1);
+  const mascot = page.locator('[data-mascot] canvas');
+  const box = await mascot.boundingBox();
+  const initialDots = await mascot.screenshot();
+  await page.mouse.move(box.x + box.width * .65, box.y + box.height * .4);
+  await page.locator('[data-mascot]').click();
+  assert.notDeepEqual(await mascot.screenshot(), initialDots, 'dots react to pointer and tap');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.waitForTimeout(100);
+  const stillDots = await mascot.screenshot();
+  await page.waitForTimeout(100);
+  assert.deepEqual(await mascot.screenshot(), stillDots, 'reduced motion stops animation');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  assert.match(await page.locator('.site-visits').innerText(), /91\s+site visits/);
   await page.getByRole("button", { name: "Decline", exact: true }).click();
   if (process.env.REVIEW_SCREENSHOTS)
     await page.screenshot({
@@ -64,7 +79,7 @@ try {
   await page.getByLabel("Username", { exact: true }).fill("browser-test");
   await page
     .getByLabel("Password", { exact: true })
-    .fill("Browser-Only-Password-2026");
+    .fill(browserPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page
     .getByRole("heading", { name: "Your portfolio, at a glance." })
