@@ -14,7 +14,7 @@ export function initMascot() {
   const pointer = {x:0,y:0,active:false,touchUntil:0};
   const still = () => reduced.matches || document.body.dataset.animations === 'off';
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
-  // Broad, short rounded arms follow the supplied baby-octopus silhouette.
+  // Eight flowing arms create a rounded, more organic 3D silhouette.
   const arms = [
     [[-105,88,-12],[-156,163,-12],[-233,160,0],[-214,88,8]],
     [[105,88,-12],[156,163,-12],[233,160,0],[214,88,8]],
@@ -22,6 +22,8 @@ export function initMascot() {
     [[75,115,5],[112,200,8],[176,228,12],[191,208,15]],
     [[-34,124,24],[-36,206,28],[-70,273,30],[-91,267,30]],
     [[34,124,24],[36,206,28],[70,273,30],[91,267,30]],
+    [[-132,92,-18],[-196,123,-9],[-230,61,5],[-183,50,16]],
+    [[132,92,-18],[196,123,-9],[230,61,5],[183,50,16]],
   ];
   function curve(c,t) { const u=1-t; return [0,1,2].map(k=>u*u*u*c[0][k]+3*u*u*t*c[1][k]+3*u*t*t*c[2][k]+t*t*t*c[3][k]); }
   let head = [];
@@ -39,7 +41,7 @@ export function initMascot() {
   function setEmotion(value) {
     emotion=value; emotionStart=performance.now(); host.dataset.expression=value;
     clearTimeout(resetTimer);
-    if(value!=='neutral') resetTimer=setTimeout(()=>{taps=[];setEmotion('neutral');},value==='angry'?3000:2000);
+    if(value!=='neutral') resetTimer=setTimeout(()=>{taps=[];setEmotion('neutral');},value==='angry'?3400:2200);
     restart();
   }
   function click() {
@@ -67,9 +69,9 @@ export function initMascot() {
     gaze.x=quiet?0:gaze.x+(tx-gaze.x)*ease; gaze.y=quiet?0:gaze.y+(ty-gaze.y)*ease;
     const angry=emotion==='angry', happy=emotion==='happy', playful=emotion==='playful';
     const settle=angry?Math.min(1,(3-age)/.7):1;
-    const bob=quiet?0:Math.sin(time*1.1)*5-(happy?Math.sin(Math.min(age,1)*Math.PI)*13:0);
-    const tilt=quiet?0:Math.sin(time*.65)*.025+(playful?Math.sin(age*3)*.09:0)+(angry?Math.sin(age*32)*.018*settle:0);
-    const yaw=gaze.x*.20+(angry?-.25*settle:0), pitch=gaze.y*.08;
+    const bob=quiet?0:Math.sin(time*.95)*9-(happy?Math.sin(Math.min(age,1)*Math.PI)*13:0);
+    const tilt=quiet?0:Math.sin(time*.65)*.042+(playful?Math.sin(age*3)*.09:0)+(angry?Math.sin(age*32)*.018*settle:0);
+    const yaw=gaze.x*.32+(angry?-.25*settle:0), pitch=gaze.y*.08;
     const squash=quiet?1:1+(happy?Math.sin(age*9)*.025*Math.exp(-age*2):0);
     const project=(x,y,z)=>{
       const rx=x*Math.cos(yaw)+z*Math.sin(yaw), rz=z*Math.cos(yaw)-x*Math.sin(yaw);
@@ -95,8 +97,8 @@ export function initMascot() {
       for(let t=0;t<1;t+=step) {
         const p=curve(c,t), next=curve(c,Math.min(1,t+.005));
         const dx=next[0]-p[0],dy=next[1]-p[1],len=Math.hypot(dx,dy)||1;
-        const wave=quiet?0:Math.sin(time*(1.1+arm*.065)-t*5+arm)*t*5;
-        p[0]+=wave; p[1]+=quiet?0:Math.cos(time*1.3+arm+t*4)*t*5;
+        const wave=quiet?0:Math.sin(time*(1.1+arm*.065)-t*5+arm)*t*10;
+        p[0]+=wave; p[1]+=quiet?0:Math.cos(time*1.3+arm+t*4)*t*9;
         if(angry){p[0]*=1-.17*t*settle;p[1]-=t*24*settle;}
         if(!quiet&&(happy||playful))p[0]+=Math.sin(age*9+arm+t*4)*t*7*Math.exp(-age*.6);
         const cap=t<.84?1:Math.sqrt(Math.max(0,1-((t-.84)/.16)**2));
