@@ -20,7 +20,6 @@ import {
 import { api, session, asset, link } from "./api";
 import { initMascot } from "./mascot";
 import { initGalaxy } from "./galaxy";
-import OptiAssistant from "./OptiAssistant";
 
 import socialSvg from "./socials.svg?raw";
 import {
@@ -248,7 +247,6 @@ function PublicLayout() {
           </div>
         </footer>
       </div>
-      <OptiAssistant />
       {!consent && s.analytics_enabled === "1" && (
         <div
           className="cookie-banner"
